@@ -64,39 +64,31 @@ end
 --@param obj table
 --@return table | string
 local function pandoc_stringify(obj)
-  local obj_type = pandoc.utils.type(obj)
+  local pandoc_type = pandoc.utils.type(obj)
+  local lua_type = type(obj)
 
-  -- Handle Inlines specially to preserve links and formatting
-  if obj_type == "Inlines" then
-    -- Check if there are any Link elements in the Inlines
-    local has_links = false
-    for _, el in ipairs(obj) do
-      if el.t == "Link" then
-        has_links = true
-        break
-      end
-    end
-    -- If there are links, convert to HTML to preserve them
-    if has_links then
-      return inlines_to_html(obj)
-    end
-    -- Otherwise just stringify
-    return pandoc.utils.stringify(obj)
+  -- Handle Inlines by converting to HTML to preserve links and formatting
+  -- Always convert to HTML since Inlines may contain Link elements
+  if pandoc_type == "Inlines" then
+    return inlines_to_html(obj)
   end
 
-  -- Handle plain strings - check for markdown link syntax
-  if obj_type == "string" then
+  -- Handle plain Lua strings - check for markdown link syntax
+  -- Use lua_type since pandoc.utils.type() may not recognize plain strings
+  if lua_type == "string" then
     return markdown_to_html(obj)
   end
 
-  if type(obj) == "table" and obj_type ~= "Blocks" then
+  -- Handle tables (but not Pandoc Blocks)
+  if lua_type == "table" and pandoc_type ~= "Blocks" then
     for k, v in pairs(obj) do
       obj[k] = pandoc_stringify(v)
     end
     return obj
-  else
-    return pandoc.utils.stringify(obj)
   end
+
+  -- Fallback: stringify any other Pandoc types
+  return pandoc.utils.stringify(obj)
 end
 
 function copy(obj, seen)
