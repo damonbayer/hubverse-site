@@ -1,0 +1,31 @@
+---
+title: "Hub Link Test"
+test_hub:
+  name: "Test Organization"
+  description: "This hub links to [Example Site](https://example.com) for testing."
+  hubs:
+    - name: "Test Hub"
+      description: "A test hub with a [markdown link](https://test.example.com/path) in the description."
+      contact:
+        - name: "Test Contact"
+          email: "test@example.com"
+      license: "MIT License"
+---
+
+This is a minimal test page to verify markdown links render in hub card descriptions.
+
+{{< include /_data/active-hubs.qmd >}}
+
+```{=html}
+<div id="test-hub-card">
+```
+
+{{< partial /_partials/hub.qmd test_hub id="test">}}
+
+```{=html}
+</div>
+```
+
+## Expected behavior
+
+The descriptions above should contain clickable links, NOT raw markdown syntax like `[text](url)`.

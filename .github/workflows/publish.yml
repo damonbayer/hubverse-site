@@ -49,6 +49,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Test hub card links
+        if: ${{ github.event_name == 'pull_request' }}
+        run: ./tests/test_hub_card_links.sh
+
       - name: Upload artifact
         if: ${{ github.event_name == 'pull_request' }}
         uses: actions/upload-artifact@v4
